@@ -96,13 +96,15 @@ function PostForm({post}) {
 
     const[imageUrl,setImageUrl] = useState("")
 
+    if(post){
+
     useEffect(()=>{
         async function getUrl(){
         const url = await appwriteService.getFilePreview(post.featuredImage);
         setImageUrl(url);
         }
         getUrl()
-    },[post.featuredImage])
+    },[post.featuredImage])}
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
