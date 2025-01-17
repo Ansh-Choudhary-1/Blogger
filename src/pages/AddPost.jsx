@@ -6,7 +6,7 @@ function AddPost() {
   return (
     <div className='py-8'>
         <Container>
-            <PostForm />
+            <PostForm post={null} />
         </Container>
 
     </div>
