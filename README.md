@@ -8,8 +8,12 @@ This is a social media app followed through with instructor Hitesh Choudhary<br>
 2. Create a post with Title, Image and description.
 3. Updation and deletion of the post.
 
+# Dependancies
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Reduxjs/toolkit
+2. Tinymce
+3. Appwrite
+4. react
+5. react-dom
+6. react-hook-form
+7. react-router-dom
