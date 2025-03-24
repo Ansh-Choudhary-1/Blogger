@@ -67,16 +67,20 @@ const router = createBrowserRouter([
         },
         {
             path: "/post/:slug",
-            element: <Post />,
+            element: (
+            <AuthLayout authentication>
+            <Post />
+            </AuthLayout>
+            ),
         },
     ],
 },
 ])
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <Provider store = {store}>
     <RouterProvider router={router}/>
     </Provider>
-  </StrictMode>,
 )
+
+//Yeh authLayout help kr rha h routes protection mei ki certain routes ka access usse hi mile jiska authentication true hai

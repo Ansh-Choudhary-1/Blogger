@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 
 export default function Post() {
     const [post, setPost] = useState(null);
-    const { slug } = useParams();
+    const { slug } = useParams();// /:slug yeh expected h tere route mei
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
@@ -18,7 +18,7 @@ export default function Post() {
     
 
     useEffect(() => {
-        if (slug) {
+        if (slug) { // Jb post create kri thi check kr slug tbse hi documentId h or Enforced h ki unique and also slug tujhe dataset mei nhi dikhega such is the document ID
             appwriteService.getPost(slug).then((post) => {
                 if (post) setPost(post);
                 else navigate("/");
@@ -79,8 +79,36 @@ export default function Post() {
                 </div>
                 <div className="browser-css">
                     {parse(post.content)}
-                    </div>
+                </div>
+                <div>By - {post.email}</div>
             </Container>
         </div>
     ) : null;
 }
+
+
+// Production grade takeaway from here 
+// 1. Check krne ke liye ki given post ka owner uss post ko dekh rha h ya nhi(to let him/her have update options) hm post mei userData.id ko postmei userId ke naam se save
+//    krwainge uske baad idhr check krenge ki tera user ki jo userData.id ha voh given ki userId se match hoti h ya nhi agr hogyi toh options denge vrna nhi
+// 2. useEffect mei async function call nhi hota directly toh tujhe useEffect ke andr ek or function bnakr usko async krna hoga jaise yha getPost pehle se async h
+// 3. Jb post create kre tb documentId mei slug rkhdio or yahi slug url mei use krio(params/routes) specific post kholne ke liye aisa krne se slug/url easily readable bhi hojaiga and enforced hojaiga
+//    ki unique ho(IMPORTANT)
+
+
+
+
+// $collectionId :"67741bec001a340462d0"
+// $createdAt : "2025-01-17T18:30:25.809+00:00"
+// $databaseId : "67741bc4002ff4b9cdcd"
+// $id : "chai-aur-code-1"
+// $permissions : (3) ['read("user:678a9b41000b26458381")', 'update("user:678a9b41000b26458381")', 'delete("user:678a9b41000b26458381")']
+// $updatedAt : "2025-01-17T18:30:25.809+00:00"
+// content : "<p>heelo this is a blog&nbsp;</p>"
+// featuredImage : "678aa1b7002ef1816267"
+// status : "active"
+// title : "chai aur code 1 "
+// userId : "678a9b41000b26458381"
+
+// Yeh upr diya hua ek sample h Properties ka jo teri post ke paas h 
+// neeche ke 5 tune khud bnaye h collection and document ko setUp kr kr appwrite mei 
+// Upr ke saare $ wale appwrite khud bnadeta h 

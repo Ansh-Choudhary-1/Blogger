@@ -5,8 +5,7 @@ import {useNavigate} from 'react-router-dom'
 export default function AuthLayout({children,authentication = true}) {
     const navigate = useNavigate();
     const [loader,setLoader] = useState(true)
-    let authStatus = useSelector(state=>state.auth.status)
-    
+    let authStatus = useSelector(state=>state.auth.status)    
 
     useEffect(()=>{
       setLoader(true);
@@ -23,4 +22,7 @@ export default function AuthLayout({children,authentication = true}) {
     loader ? <h1>Loading...</h1>:<>{children}</>
   )
 }
+
+//Yeh ek tareeka h protected routes create krne ka 
+
 

@@ -23,3 +23,7 @@ function Logoutbtn() {
 }
 
 export default Logoutbtn
+
+
+// Production grade takeaway from here 
+// Ek store mei state bnalio jo pure code ko yeh btaye ki user loggedin h ya logged out h(authstatus) 

@@ -1,38 +1,29 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
 import conf from "../conf/conf";
 
-export class Service{
-    client = new Client();
-    databases;
-    bucket;
-    constructor(){
-        this.client
-        .setEndpoint(conf.appwriteUrl)
-        .setProject(conf.appwriteProjectID);
-        this.databases = new Databases(this.client)
-        this.bucket = new Storage(this.client)
-    }
+const client = new Client()
+                        .setEndpoint(conf.appwriteUrl)
+                        .setProject(conf.appwriteProjectID);
 
-    async createPost({title, slug, featuredImage, status, userId,content}){
+const databases = new Databases(client);
+const bucket = new Storage(client);
+
+export class Service{
+
+    async createPost({title, slug, featuredImage, status, userId,content,email}){
         try {
-            console.log("Creating Post with data",{
-                title,
-                slug,
-                featuredImage,
-                status,
-                userId,
-            });
             
-            const response =  await this.databases.createDocument(
+            const response =  await databases.createDocument(
                 conf.appwriteDatabaseID,
                 conf.appwriteCollectionID,
-                slug,
+                slug, // Slug ko hm documentId bna rhe h idhr toh yeh enforced h ki unique ho
                 {
                     title,
                     content,
                     featuredImage,
                     status,
-                    userId
+                    userId,
+                    email
                 }
             )
             console.log("Document created successfully:", response);
@@ -46,7 +37,7 @@ export class Service{
     async updatePost(slug,{title, content, featuredImage, status}){//userId not needed cuz hm ussi ko update krna allow krenge jisski id hogi 
         
         try {
-            return await this.databases.updateDocument(
+            return await databases.updateDocument(
                 conf.appwriteDatabaseID, // databaseId
                 conf.appwriteCollectionID, // collectionId
                 slug, // documentId
@@ -67,7 +58,7 @@ export class Service{
     async deletePost(slug){
         
         try {
-                await this.databases.deleteDocument(
+                await databases.deleteDocument(
                 conf.appwriteDatabaseID, // databaseId
                 conf.appwriteCollectionID, // collectionId
                 slug // queries (optional)
@@ -79,9 +70,9 @@ export class Service{
         }
     }
 
-    async getPost(slug){ // this gives all the posts
+    async getPost(slug){ // this give a specific post/document by it's id
         try {
-            return await this.databases.getDocument(
+            return await databases.getDocument(
                 conf.appwriteDatabaseID, // databaseId
                 conf.appwriteCollectionID, // collectionId
                 slug, // documentId
@@ -94,8 +85,8 @@ export class Service{
     }
 
     async getPosts(queries = [Query.equal("status","active")]){//Query use krne ke lie Appwrite mei index zaroor bnaio
-        try {
-            return await this.databases.listDocuments(
+        try {// this gives all the post/document present in collections
+            return await databases.listDocuments(
                 conf.appwriteDatabaseID,
                 conf.appwriteCollectionID,
                 queries
@@ -111,10 +102,10 @@ export class Service{
 
     async uploadFile(file){
         try {
-            return await this.bucket.createFile(
+            return await bucket.createFile(
                 conf.appwriteBucketID,
                 ID.unique(),
-                file
+                file   // Jb laut kr aye isko smjh lio or msg delete krdio
             )
         } catch (error) {
             console.log("Appwrite serive :: uploadFile :: error", error);
@@ -124,7 +115,7 @@ export class Service{
 
     async deleteFile(fileId){
         try {
-            await this.bucket.deleteFile(
+            await bucket.deleteFile(
                 conf.appwriteBucketID,
                 fileId
             )
@@ -140,7 +131,7 @@ export class Service{
         console.log(fileId);
         
         try {
-            const response = await this.bucket.getFilePreview(
+            const response = await bucket.getFilePreview(
                 conf.appwriteBucketID,
                 fileId
             )
@@ -157,3 +148,8 @@ export class Service{
 
 const service = new Service()
 export default service;
+
+
+
+// Appwrite mei 3 cheeze hoti h Databases>collections>documents && Storage>Files && Account for authentication purposes
+// Tera data store hota h documents(Like posts) mei or files(like Photos) store hoti h Storage mei

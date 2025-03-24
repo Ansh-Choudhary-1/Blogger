@@ -35,12 +35,13 @@ function PostForm({post}) {
                     ...data,
                     featuredImage: file ? file.$id: undefined
                 })
-
+                
                 console.log("Post updated:", dbPost);
                     if(dbPost){
                         navigate(`/post/${dbPost.$id}`)
                         return;
-                    }    
+                    } 
+                   
             }else{
                 console.log("Creating a new post.");
                 
@@ -48,11 +49,12 @@ function PostForm({post}) {
                 console.log("File uploaded for new post:", file);
 
                 if(file){
-                    const fileId = file.$id
-                    data.featuredImage = fileId;
+                    const fileId = file.$id //$id ek reserved field h jo appwrite deta h hr resource ko
+                    data.featuredImage = fileId; // featuredImage is directly added to data
                     const dbPost =  await appwriteService.createPost({
                         ...data,
-                        userId: userData.$id,
+                        userId: userData.$id,// userData authentication ke time bn kr store mei daaldiya tha
+                        email: userData.email,
                     })
 
                     console.log("Post created:", dbPost);
@@ -74,13 +76,12 @@ function PostForm({post}) {
             .toLowerCase()
             .replace(/[^a-zA-Z\d\s]+/g, "-") // d== digits, s==spaces
             .replace(/\s/g,'-')
-
-            return '';
         }
     },[])
 
+    
     useEffect(()=>{
-        const subscription = watch(((value,{name})=>{
+        const subscription = watch(((value,{name})=>{ //Value of all the input in the form and name is the input which has changed
             if(name === 'title'){
                 setValue('slug',slugTransform(value.title),
                     {shouldValidate: true}
@@ -95,6 +96,7 @@ function PostForm({post}) {
 
     const[imageUrl,setImageUrl] = useState("")
 
+if(post){
     useEffect(()=>{
         async function getUrl(){
         const url = await appwriteService.getFilePreview(post.featuredImage);
@@ -102,6 +104,7 @@ function PostForm({post}) {
         }
         getUrl()
     },[post.featuredImage])
+}
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
@@ -117,9 +120,6 @@ function PostForm({post}) {
                     placeholder="Slug"
                     className="mb-4"
                     {...register("slug", { required: true })}
-                    onInput={(e) => {
-                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
-                    }}
                 />
                 <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} {...register("content", { required: true })} />
             </div>
@@ -135,7 +135,6 @@ function PostForm({post}) {
                     <div className="w-full mb-4">
                         <img
                             src={imageUrl}
-
                             alt={post.title}
                             className="rounded-lg"
                         />
@@ -156,3 +155,14 @@ function PostForm({post}) {
 }
 
 export default PostForm
+
+// Production grade things from here
+// 1. 
+//      Watch : reactively access the current state of the form inputs  so when a user interacts with the form, you can respond to changes dynamically
+//      setValue : programatically sets the value of an input(Mostly jb prefilling krni hoti h kisi input ki tb kaam ata h) yeh value set hone ke baad register hoti h
+//      getValue : used to fetch the current form data at a specific point in time without subscribing to changes
+// 2. Kis tareeke se watch ko use kr kr setValue krte h kisi or input ki
+// 3. Image upload krne ke liye accept mei types daaldio
+// 4. bs ek baar class Import krni h fir tu uske andr ke function directly use kr skta h
+// 5. pehle upload file kradio or agr uske baad if(file) kr kr post bnaio ya creata document
+// 6. To prefill a form useForm({ defaultValues:{title:,etc.etc.}})

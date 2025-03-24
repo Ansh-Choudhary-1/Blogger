@@ -25,6 +25,7 @@ function SignIn() {
         }
       } catch (error) {
         setError(error.message)
+        alert(error.message)
       }
     }
   return (
@@ -45,7 +46,7 @@ function SignIn() {
                         Sign In
                     </Link>
                 </p>
-                {error &&<p className="text-red-600 mt-8 text-center">{error}</p>}
+                <p className="text-red-600 mt-8 text-center">{error}</p>
                 <form onSubmit={handleSubmit(create)}>
                   <div className='space-y-5'>
                     <Input
@@ -88,3 +89,7 @@ function SignIn() {
 }
 
 export default SignIn
+
+
+//Production grade takeaways from here
+// 1. Ek smart way mei error handling ho rhi h error ko useState mei daaldiya or agr error ho rha h toh setError kr kr ek para print kraya h

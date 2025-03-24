@@ -9,13 +9,16 @@ function Home() {
     const [posts, setPosts] = useState([])
 
     const authStatus = useSelector((state)=>state.auth?.status)
+    //Fetching Post
     useEffect(()=>{
         appwriteService.getPosts().then((posts)=>{
             if(posts){
-                setPosts(posts.documents)
+                setPosts(posts.documents)//This is a list of arrays
             }
         })
     },[])
+
+
     if(authStatus==false){
         return <div>Please Login</div>
     }
@@ -42,3 +45,13 @@ function Home() {
 }
 
 export default Home
+
+// Dekh kis tarah redux ke auth ko use kr kr hm status lekr layout design kr rhe h
+// {
+//     "total": 10,
+//     "documents": [
+//         { ...post1 },
+//         { ...post2 },
+//         ...
+//     ]
+// } This is the structure in which getPosts returns

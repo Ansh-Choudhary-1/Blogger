@@ -1,23 +1,21 @@
-import { useSelector } from "react-redux";
 import conf from "../conf/conf";
 import { Client, Account, ID } from "appwrite"; // components from appwrite
 
+const client = new Client()
+                    .setEndpoint(conf.appwriteUrl)
+                    .setProject(conf.appwriteProjectID);
+
+const account = new Account(client);
+
+
 export class AuthService{
-    client = new Client(); //Client is created (this connects our application to appwrite server)
-    account;
-    constructor(){
-        this.client
-            .setEndpoint(conf.appwriteUrl)
-            .setProject(conf.appwriteProjectID);
-            this.account = new Account(this.client);//Account is created (this provide authentication services for users it is like a user management and will be initialised only for once)
-    }
 
     async createAccount({email,password,name}){
         try {
-            const userAccount = await this.account.create(ID.unique(),email,password,name); // creates 
+            const userAccount = await account.create(ID.unique(),email,password,name); // creates 
             if(userAccount){
                 //call another method
-                return await this.logIn({email,password});
+                return await logIn({email,password});
             }
             else{
                 return userAccount;
@@ -28,7 +26,7 @@ export class AuthService{
     }
     async logIn({email, password}){
         try {
-            return await this.account.createEmailPasswordSession(email,password);
+            return await account.createEmailPasswordSession(email,password);
         } catch (error) {
             throw error;
         }
@@ -36,9 +34,9 @@ export class AuthService{
 
     async getCurrentUser(){
         try {
-            const session =  await this.account.getSession('current');
+            const session =  await account.getSession('current');
             if(session){
-                return await this.account.get();
+                return await account.get();
             }
         } catch (error) {
             if(error.code===401){
@@ -52,9 +50,9 @@ export class AuthService{
 
     async logout(){
         try {
-            const session = await this.account.getSession('current');
+            const session = await account.getSession('current');
             if(session){
-            return await this.account.deleteSession(session.$id);
+            return await account.deleteSession(session.$id);
         }
         
         } catch (error) {

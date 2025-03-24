@@ -23,7 +23,7 @@ function App() {
   },[])
 
 
-  return!loading? (
+  return loading?"Please wait" :(
     <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
       <div className='w-full block'>
         <Header/>
@@ -33,7 +33,10 @@ function App() {
         <Footer/>
       </div>
     </div>
-  ):null
+  )
 }
 
 export default App
+
+// Login ke time pr get user se sara data lekr redux store mei daalna h taaki tu usse flexibly use kr paye
+// ab iss file mei kyuki <Outlet/> rkha h toh createRoute mei jakr element mei isko daalenge <App/> or children mei fir baaki ki cheeze daalenge

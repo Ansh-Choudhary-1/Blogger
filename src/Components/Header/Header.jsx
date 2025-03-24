@@ -72,3 +72,8 @@ function Header() {
 }
 
 export default Header
+
+
+// Production grade takeAways from here 
+// 1. Navbar bnane ke liye ek array create krle usmei slug daal name daal state daal and fir usko map krle and navigate mei slug daalde
+// 2. Logout button ke liye authstatus dekhlio or && ka use krlio
