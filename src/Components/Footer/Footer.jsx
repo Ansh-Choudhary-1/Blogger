@@ -14,7 +14,7 @@ function Footer() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">
-                                    Made with Love by Ansh &copy;Copyright 2024. All Rights Reserved by DevUI.
+                                    &copy; Copyright 2025. All Rights Reserved by AnshChoudhary.
                                 </p>
                             </div>
                         </div>

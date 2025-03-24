@@ -6,6 +6,7 @@ import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 
 function PostForm({post}) {
+    console.log(post);
     const {register, handleSubmit, watch, setValue, control, getValues} = useForm({
         defaultValues: {
             title: post?.title||'',
@@ -23,7 +24,7 @@ function PostForm({post}) {
         try {
             console.log("Submit function called with data:", data);
             
-            if (post){
+            if (post !=null){
                 console.log("Updating an existing post.");
                 const file = data.image[0]?await appwriteService.uploadFile(data.image[0]):null;
                 console.log("File uploaded:", file);

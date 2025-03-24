@@ -85,7 +85,7 @@ export class Service{
     }
 
     async getPosts(queries = [Query.equal("status","active")]){//Query use krne ke lie Appwrite mei index zaroor bnaio
-        try {// this gives all the post/document present in collections
+        try {
             return await databases.listDocuments(
                 conf.appwriteDatabaseID,
                 conf.appwriteCollectionID,
