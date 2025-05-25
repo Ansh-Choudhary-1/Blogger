@@ -1,66 +1,67 @@
-import conf from "../conf/conf";
-import { Client, Account, ID } from "appwrite"; // components from appwrite
+import conf from "../conf/conf.js";
+import { Client, Account, ID } from "appwrite";
 
-const client = new Client()
-                    .setEndpoint(conf.appwriteUrl)
-                    .setProject(conf.appwriteProjectID);
+export class AuthService {
+  client = new Client();
+  account;
 
-const account = new Account(client);
+  constructor() {
+    this.client.setEndpoint(conf.appwriteUrl);
+    this.client.setProject(conf.appwriteprojectid);
+    this.account = new Account(this.client);
+  }
 
+  async createAccount({email,password,name}) {
+    try {
+      const userAccount = await this.account.create(
+        ID.unique(),
+        email,
+        password,
+        name
+      );
 
-export class AuthService{
+      if (userAccount) {
+        // Update name in user preferences
+      
 
-    async createAccount({email,password,name}){
-        try {
-            const userAccount = await account.create(ID.unique(),email,password,name); // creates 
-            if(userAccount){
-                //call another method
-                return await logIn({email,password});
-            }
-            else{
-                return userAccount;
-            }
-        } catch (error) {
-            throw error;
-        }
+        return this.login({email,password});
+      } else {
+        return userAccount;
+      }
+    } catch (error) {
+      throw error;
     }
-    async logIn({email, password}){
-        try {
-            return await account.createEmailPasswordSession(email,password);
-        } catch (error) {
-            throw error;
-        }
-    }
+  }
 
-    async getCurrentUser(){
-        try {
-            const session =  await account.getSession('current');
-            if(session){
-                return await account.get();
-            }
-        } catch (error) {
-            if(error.code===401){
-                console.log('No active session. Guest user.');
-                
-            }else{
-            console.log("Appwrite serive :: getCurrentUser :: error",error);
-        }}
-        return null;
+  async login({ email, password }) {
+    try {
+      return await this.account.createEmailPasswordSession(email, password);
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async logout(){
-        try {
-            const session = await account.getSession('current');
-            if(session){
-            return await account.deleteSession(session.$id);
-        }
-        
-        } catch (error) {
-            console.log("Appwrite serive :: logout :: error",error)
-        }
+  async getCurrentUser() {
+    try {
+      return await this.account.get();
+    } catch (error) {
+      console.log("Appwrite service :: getCurrentUser :: error", error);
     }
+    return null;
+  }
+
+  async logout() {
+    try {
+      return await this.account.deleteSessions();
+    } catch (error) {
+      console.log("Appwrite service :: logout :: error", error);
+    }
+  }
 }
 
-const authService =  new AuthService();
-
+const authService = new AuthService();
 export default authService;
+
+
+//authentication service yahi use hoga haar baar 
+// ;) :)

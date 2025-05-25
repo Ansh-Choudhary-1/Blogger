@@ -1,114 +1,210 @@
+// import React, { useEffect, useState } from "react";
+// import { Link, useNavigate, useParams } from "react-router-dom";
+// import appwriteService from "../appwrite/config.js";
+// import { Button, Container } from "../components";
+// import parse from "html-react-parser";
+// import { useSelector } from "react-redux";
+
+// export default function Post() {
+//   const [post, setPost] = useState(null);
+//   const [image, setImage] = useState('');
+//   const { slug } = useParams();
+//   const navigate = useNavigate();
+//   const userData = useSelector((state) => state.auth.userData);
+  
+//   const isAuthor = post && userData ? post.userId === userData.$id : false;
+
+//   useEffect(() => {
+//     if (slug) {
+//       appwriteService.getPost(slug)
+//         .then((post) => {
+//           if (post && post.$id) {
+//             setPost(post);
+//           } else {
+//             navigate("/");
+//           }
+//         })
+//         .catch((error) => {
+//           console.error("Error fetching post:", error);
+//           navigate("/");
+//         });
+//     } else {
+//       navigate("/");
+//     }
+//   }, [slug, navigate]);
+
+//   const deletePost = () => {
+//     if (post && post.$id) {
+//       // Using slug instead of $id for consistency with your service method
+//       appwriteService.deletePost(slug).then((status) => {
+//         if (status.success) {
+//           // Make sure to use the same property name as in your data model
+//           appwriteService.deleteFile(post.featuredimages);
+//           navigate("/");
+//         }
+//       }).catch((error) => {
+//         console.error("Error deleting post:", error);
+//       });
+//     }
+//   };
+
+//   useEffect(() => {
+//     const fetchImage = async () => {
+//       // Check if post exists and has featuredimages before fetching
+//       if (post && post.featuredimages) {
+//         try {
+//           const url = await appwriteService.getFilePreview(post.featuredimages);
+//           setImage(url);
+//         } catch (error) {
+//           console.error("Error fetching image:", error);
+//         }
+//       }
+//     };
+    
+//     fetchImage();
+//   }, [post]); // Add post as a dependency since we're using post.featuredimages
+
+//   return post ? (
+//     <div className="py-8">
+//       <Container>
+//         <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
+//           <img
+//             src={image ? image : ""}
+//             alt={post.title}
+//             className="rounded-xl"
+//           />
+
+//           {isAuthor && (
+//             <div className="absolute right-6 top-6">
+//               <Link to={`/edit-post/${post.$id}`}>
+//                 <Button bgColor="bg-green-500" className="mr-3">
+//                   Edit
+//                 </Button>
+//               </Link>
+//               <Button bgColor="bg-red-500" onClick={deletePost}>
+//                 Delete
+//               </Button>
+//             </div>
+//           )}
+//         </div>
+//         <div className="w-full mb-6">
+//           <h1 className="text-2xl font-bold">{post.title}</h1>
+//         </div>
+//         <div className="browser-css">{parse(post.content)}</div>
+//       </Container>
+//     </div>
+//   ) : null;
+// }
+
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import appwriteService from "../appwrite/config";
-import { Button, Container } from "../Components/index";
+import appwriteService from "../appwrite/config.js";
+import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useSelector } from "react-redux";
 
 export default function Post() {
-    const [post, setPost] = useState(null);
-    const { slug } = useParams();// /:slug yeh expected h tere route mei
-    const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [image, setImage] = useState('');
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const userData = useSelector((state) => state.auth.userData);
+  
+  const isAuthor = post && userData ? post.userId === userData.$id : false;
 
-    const userData = useSelector((state) => state.auth.userData);
-
-    const isAuthor = post && userData ? post.userId === userData.$id : false;
-
-    console.log(post); 
-    
-
-    useEffect(() => {
-        if (slug) { // Jb post create kri thi check kr slug tbse hi documentId h or Enforced h ki unique and also slug tujhe dataset mei nhi dikhega such is the document ID
-            appwriteService.getPost(slug).then((post) => {
-                if (post) setPost(post);
-                else navigate("/");
-            });
-        } else navigate("/");
-    }, [slug, navigate]);
-
-
-
-    const deletePost = async () => {
-        console.log("button clicked");
-        
-        await appwriteService.deletePost(post.$id).then((status) => {
-            if (status) {
-                appwriteService.deleteFile(post.featuredImage);
-                navigate("/");
-            }
+  useEffect(() => {
+    if (slug) {
+      appwriteService.getPost(slug)
+        .then((post) => {
+          if (post && post.$id) {
+            setPost(post);
+          } else {
+            navigate("/");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching post:", error);
+          navigate("/");
         });
-        console.log("Daffa ho");
-    };
+    } else {
+      navigate("/");
+    }
+  }, [slug, navigate]);
 
-
-    const [imageUrl,setImageUrl]= useState("");
-    useEffect(()=>{
-        async function getUrl(){
-            if(post){
-            const url = await appwriteService.getFilePreview(post.featuredImage);
-            setImageUrl(url)}
+  const deletePost = () => {
+    if (post && post.$id) {
+      appwriteService.deletePost(slug).then((status) => {
+        if (status.success) {
+          appwriteService.deleteFile(post.featuredimages);
+          navigate("/");
         }
-        getUrl();
-    },[post])
+      }).catch((error) => {
+        console.error("Error deleting post:", error);
+      });
+    }
+  };
 
-    return post ? (
-        <div className="py-8">
-            <Container>
-                <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
-                    <img
-                        src={imageUrl}
-                        alt={post.title}
-                        className="rounded-xl"
-                    />
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (post && post.featuredimages) {
+        try {
+          const url = await appwriteService.getFilePreview(post.featuredimages);
+          setImage(url);
+        } catch (error) {
+          console.error("Error fetching image:", error);
+        }
+      }
+    };
+    
+    fetchImage();
+  }, [post]);
 
-                    {isAuthor && (
-                        <div className="absolute right-6 top-6">
-                            <Link to={`/edit-post/${post.$id}`}>
-                                <Button bgColor="bg-green-500" className="mr-3">
-                                    Edit
-                                </Button>
-                            </Link>
-                            <Button onClick={deletePost} bgColor="bg-red-500" >
-                                Delete
-                            </Button>
-                        </div>
-                    )}
-                </div>
-                <div className="w-full mb-6">
-                    <h1 className="text-2xl font-bold">{post.title}</h1>
-                </div>
-                <div className="browser-css">
-                    {parse(post.content)}
-                </div>
-                <div>By - {post.email}</div>
-            </Container>
+  return post ? (
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+      <Container>
+        {/* Featured Image Container */}
+        <div className="w-full relative mb-8 rounded-xl overflow-hidden shadow-lg">
+          {image && (
+            <img
+              src={image}
+              alt={post.title}
+              className="w-full h-auto max-h-[500px] object-cover"
+            />
+          )}
+          
+          {isAuthor && (
+            <div className="absolute right-6 top-6 flex space-x-3">
+              <Link to={`/edit-post/${post.$id}`}>
+                <Button 
+                  bgColor="bg-green-500 hover:bg-green-600" 
+                  className="transition-colors duration-200 shadow-md"
+                >
+                  Edit
+                </Button>
+              </Link>
+              <Button 
+                bgColor="bg-red-500 hover:bg-red-600" 
+                onClick={deletePost}
+                className="transition-colors duration-200 shadow-md"
+              >
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
-    ) : null;
+
+        {/* Post Content */}
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-gray-800 mb-6">
+            {post.title}
+          </h1>
+          
+          <div className="prose max-w-none">
+            {parse(post.content)}
+          </div>
+        </div>
+      </Container>
+    </div>
+  ) : null;
 }
-
-
-// Production grade takeaway from here 
-// 1. Check krne ke liye ki given post ka owner uss post ko dekh rha h ya nhi(to let him/her have update options) hm post mei userData.id ko postmei userId ke naam se save
-//    krwainge uske baad idhr check krenge ki tera user ki jo userData.id ha voh given ki userId se match hoti h ya nhi agr hogyi toh options denge vrna nhi
-// 2. useEffect mei async function call nhi hota directly toh tujhe useEffect ke andr ek or function bnakr usko async krna hoga jaise yha getPost pehle se async h
-// 3. Jb post create kre tb documentId mei slug rkhdio or yahi slug url mei use krio(params/routes) specific post kholne ke liye aisa krne se slug/url easily readable bhi hojaiga and enforced hojaiga
-//    ki unique ho(IMPORTANT)
-
-
-
-
-// $collectionId :"67741bec001a340462d0"
-// $createdAt : "2025-01-17T18:30:25.809+00:00"
-// $databaseId : "67741bc4002ff4b9cdcd"
-// $id : "chai-aur-code-1"
-// $permissions : (3) ['read("user:678a9b41000b26458381")', 'update("user:678a9b41000b26458381")', 'delete("user:678a9b41000b26458381")']
-// $updatedAt : "2025-01-17T18:30:25.809+00:00"
-// content : "<p>heelo this is a blog&nbsp;</p>"
-// featuredImage : "678aa1b7002ef1816267"
-// status : "active"
-// title : "chai aur code 1 "
-// userId : "678a9b41000b26458381"
-
-// Yeh upr diya hua ek sample h Properties ka jo teri post ke paas h 
-// neeche ke 5 tune khud bnaye h collection and document ko setUp kr kr appwrite mei 
-// Upr ke saare $ wale appwrite khud bnadeta h 

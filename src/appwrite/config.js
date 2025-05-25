@@ -1,155 +1,129 @@
-import { Client, Databases, ID, Query, Storage } from "appwrite";
-import conf from "../conf/conf";
+import conf from "../conf/conf.js";
+import { Client, ID, Databases, Query, Storage } from "appwrite";
 
-const client = new Client()
-                        .setEndpoint(conf.appwriteUrl)
-                        .setProject(conf.appwriteProjectID);
+export class AppwriteService {
+  client = new Client();
+  databases;
+  bucket;
 
-const databases = new Databases(client);
-const bucket = new Storage(client);
+  constructor() {
+    this.client
+      .setEndpoint(conf.appwriteUrl)
+      .setProject(conf.appwriteprojectid);
+    this.databases = new Databases(this.client);
+    this.bucket = new Storage(this.client);
+  }
 
-export class Service{
-
-    async createPost({title, slug, featuredImage, status, userId,content,email}){
-        try {
-            
-            const response =  await databases.createDocument(
-                conf.appwriteDatabaseID,
-                conf.appwriteCollectionID,
-                slug, // Slug ko hm documentId bna rhe h idhr toh yeh enforced h ki unique ho
-                {
-                    title,
-                    content,
-                    featuredImage,
-                    status,
-                    userId,
-                    email
-                }
-            )
-            console.log("Document created successfully:", response);
-            return response;
-            
-        } catch (error) {
-            console.log("Appwrite serive :: createPost :: error",error)
-        }
-    }
-
-    async updatePost(slug,{title, content, featuredImage, status}){//userId not needed cuz hm ussi ko update krna allow krenge jisski id hogi 
+  async createPost({ title, slug, content, featuredimages, status, userId }) {
+    console.log(userId);
+    try {
+      //mongodb kar deneg if koi issue huya to 
+      return await this.databases.createDocument(
+        conf.appwritedatabaseid,
+        conf.appwritecollectionid,
+        slug, //document id hota hai but
+        //id.unique bhi hota hai
+        { title, content, featuredimages, status, userId }
         
-        try {
-            return await databases.updateDocument(
-                conf.appwriteDatabaseID, // databaseId
-                conf.appwriteCollectionID, // collectionId
-                slug, // documentId
-                {
-                    title,
-                    content,
-                    featuredImage,
-                    status
-                }, // data (optional)
-                // permissions (optional)
-            );
-        } catch (error) {
-            console.log("Appwrite serive :: updatePost :: error", error);
-            
-        }
+      );
+    } catch (error) {
+      console.error("Error in createPost:", error);
+      throw error;
     }
+  }
 
-    async deletePost(slug){
-        
-        try {
-                await databases.deleteDocument(
-                conf.appwriteDatabaseID, // databaseId
-                conf.appwriteCollectionID, // collectionId
-                slug // queries (optional)
-            );
-            return true
-        } catch (error) {
-            console.log("Appwrite serive :: deletePost :: error", error);
-            return false
-        }
+  async updatePost(slug, { title, content, featuredImage, status }) {
+    try {
+      return await this.databases.updateDocument(
+        conf.appwritedatabaseid,
+        conf.appwritecollectionid,
+        slug,
+        { title, content, featuredImage, status }
+      );
+    } catch (error) {
+      console.error("Error in updatePost:", error);
+      throw error;
     }
+  }
+  
 
-    async getPost(slug){ // this give a specific post/document by it's id
-        try {
-            return await databases.getDocument(
-                conf.appwriteDatabaseID, // databaseId
-                conf.appwriteCollectionID, // collectionId
-                slug, // documentId
-            );
-        } catch (error) {
-            console.log("Appwrite serive :: getPost :: error", error);
-            return false;
-            
-        }
+  async deletePost(slug) {
+    try {
+      await this.databases.deleteDocument(
+        conf.appwritedatabaseid,
+        conf.appwritecollectionid,
+        slug
+      );
+      return { success: true };
+    } catch (error) {
+      console.error("Error in deletePost:", error);
+      return { success: false, error };
     }
+  }
 
-    async getPosts(queries = [Query.equal("status","active")]){//Query use krne ke lie Appwrite mei index zaroor bnaio
-        try {
-            return await databases.listDocuments(
-                conf.appwriteDatabaseID,
-                conf.appwriteCollectionID,
-                queries
-            )
-            console.log("Posts retrieved: ", posts);
-        } catch (error) {
-            console.log("Appwrite serive :: getPosts :: error", error);
-            return false;
-        }
+  async getPost(slug) {
+    try {
+      return await this.databases.getDocument(
+        conf.appwritedatabaseid,
+        conf.appwritecollectionid,
+        slug
+      );
+    } catch (error) {
+      console.error("Error in getPost:", error);
+      return { success: false, error };
     }
+  }
 
-    //file upload/delete service
-
-    async uploadFile(file){
-        try {
-            return await bucket.createFile(
-                conf.appwriteBucketID,
-                ID.unique(),
-                file   // Jb laut kr aye isko smjh lio or msg delete krdio
-            )
-        } catch (error) {
-            console.log("Appwrite serive :: uploadFile :: error", error);
-            return false;   
-        }
+  async getPosts(queries = [Query.equal("status", "active")]) {
+    try {
+      return await this.databases.listDocuments(
+        conf.appwritedatabaseid,
+        conf.appwritecollectionid,
+        queries
+      );
+    } catch (error) {
+      console.error("Error in getPosts:", error);
+      return { success: false, error };
     }
+  }
 
-    async deleteFile(fileId){
-        try {
-            await bucket.deleteFile(
-                conf.appwriteBucketID,
-                fileId
-            )
-            return true
-        } catch (error) {
-            console.log("Appwrite serive :: deleteFile :: error", error);
-            return false;
-        }
-
+  // File Upload
+  async uploadFile(file) {
+    try {
+      return await this.bucket.createFile(
+        conf.appwritebucketid,
+        ID.unique(),
+        file
+      );
+    } catch (error) {
+      console.error("Error in uploadFile:", error);
+      return { success: false, error };
     }
+  }
 
-    async getFilePreview(fileId){
-        console.log(fileId);
-        
-        try {
-            const response = await bucket.getFilePreview(
-                conf.appwriteBucketID,
-                fileId
-            )
-            console.log(response);
-            return response;
-            
-            
-        } catch (error) {
-            console.log(error);
-            
-        }                
+  async deleteFile(fileID) {
+    try {
+      await this.bucket.deleteFile(conf.appwritebucketid, fileID);
+      return { success: true };
+    } catch (error) {
+      console.error("Error in deleteFile:", error);
+      return { success: false, error };
     }
+  }
+
+  async getFilePreview(fileId) {
+    try {
+      if (!fileId) {
+        console.error("No file ID provided to getFilePreview");
+        return null;
+      }
+      return this.bucket.getFileView(conf.appwritebucketid, fileId);
+    } catch (error) {
+      console.error("Error in getFilePreview:", error);
+      return null;
+    }
+  }
 }
 
-const service = new Service()
-export default service;
-
-
-
-// Appwrite mei 3 cheeze hoti h Databases>collections>documents && Storage>Files && Account for authentication purposes
-// Tera data store hota h documents(Like posts) mei or files(like Photos) store hoti h Storage mei
+const appwriteService = new AppwriteService();
+export default appwriteService;
