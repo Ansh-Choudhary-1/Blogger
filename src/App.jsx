@@ -48,8 +48,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import authService from "./appwrite/auth";
-import { logout, login } from "./store/authSlice";
-import { Header, Footer } from "./components";
+import { logout, login } from "./Store/authSlice";
+import { Header, Footer } from "./Components";
 import { Outlet } from "react-router-dom";
 
 function App() {

@@ -13,7 +13,7 @@
 
 
 import React from "react";
-import { Signup as SignupComponents } from "../components";
+import { Signup as SignupComponents } from "../Components";
 
 function Signup() {
   return (

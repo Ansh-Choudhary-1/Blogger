@@ -100,7 +100,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import appwriteService from "../appwrite/config.js";
-import { Button, Container } from "../components";
+import { Button, Container } from "../Components/index.js";
 import parse from "html-react-parser";
 import { useSelector } from "react-redux";
 

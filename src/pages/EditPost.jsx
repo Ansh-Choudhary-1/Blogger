@@ -33,8 +33,8 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Container } from "../components";
-import PostForm from "../components/post-form/PostForm.jsx";
+import { Container } from "../Components/index.js";
+import PostForm from "../Components/post-form/PostForm.jsx";
 import appwriteService from "../appwrite/config";
 import { useNavigate, useParams } from "react-router-dom";
 
