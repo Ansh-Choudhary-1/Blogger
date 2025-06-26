@@ -41,7 +41,7 @@ function Header() {
       <Container>
         <nav className="flex items-center justify-between h-16">
           <Link to="/" className="text-2xl font-display font-bold text-gray-900">
-            BlogCraft
+            Blogger
           </Link>
           
           <ul className="flex items-center space-x-2">
