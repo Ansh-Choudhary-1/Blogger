@@ -1,73 +1,17 @@
-// import React from "react";
-// import { Editor } from "@tinymce/tinymce-react";
-
-// import { Controller } from "react-hook-form";
-
-// export default function RTE({ name, control, label, defaultValue = "" }) {
-//   return (
-//     <div className="w-full">
-//       {label && <label className="inline-block mb-1 pl-1">{label}</label>}
-
-//       <Controller
-//         name={name || "content"}
-//         control={control}
-//         render={({ field: { onChange } }) => (
-//           <Editor
-//             initialValue={defaultValue}
-//             apiKey='qao5sgbszpb9mp752c40eyocl8w3jkime0fndo083rlziqze'
-//             init={{
-//               // initialValue: defaultValue,
-//               height: 500,
-//               menubar: true,
-//               plugins: [
-//                 "image",
-//                 "advlist",
-//                 "autolink",
-//                 "lists",
-//                 "link",
-
-//                 "charmap",
-//                 "preview",
-//                 "anchor",
-//                 "searchreplace",
-//                 "visualblocks",
-//                 "code",
-//                 "fullscreen",
-//                 "insertdatetime",
-//                 "media",
-//                 "table",
-
-//                 "help",
-//                 "wordcount",
-//                 "anchor",
-//               ],
-//               toolbar:
-//                 "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
-//               content_style:
-//                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-//             }}
-//             onEditorChange={onChange}
-//           />
-//         )}
-//       />
-//     </div>
-//   );
-// }
-
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Controller } from "react-hook-form";
 
 export default function RTE({ name, control, label, defaultValue = "" }) {
   return (
-    <div className="w-full mb-6">
+    <div className="w-full space-y-2">
       {label && (
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
         </label>
       )}
 
-      <div className="rounded-lg border border-gray-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="relative rounded-lg border border-gray-300 shadow-sm hover:border-blue-500 transition-colors duration-200">
         <Controller
           name={name || "content"}
           control={control}
@@ -77,47 +21,78 @@ export default function RTE({ name, control, label, defaultValue = "" }) {
               apiKey="qao5sgbszpb9mp752c40eyocl8w3jkime0fndo083rlziqze"
               init={{
                 height: 500,
-                menubar: false, // Cleaner UI without menubar
+                menubar: true,
+                readonly: false,
                 skin: "oxide",
                 content_css: "default",
                 plugins: [
-                  "advlist autolink lists link image charmap preview anchor",
-                  "searchreplace visualblocks code fullscreen",
-                  "insertdatetime media table help wordcount"
+                  "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
+                  "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
+                  "insertdatetime", "media", "table", "help", "wordcount"
                 ],
-                toolbar: `
-                  undo redo | blocks | 
-                  bold italic forecolor | 
-                  alignleft aligncenter alignright alignjustify | 
-                  bullist numlist outdent indent | 
-                  link image media table |
-                  code preview | help
-                `,
+                toolbar: [
+                  "undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify |",
+                  "bullist numlist outdent indent | removeformat | help | image media link table code"
+                ].join(" "),
                 content_style: `
-                  body { 
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-                    font-size: 15px; 
-                    line-height: 1.6; 
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                    font-size: 16px;
+                    line-height: 1.6;
                     color: #374151;
+                    margin: 1rem;
                   }
-                  h1 { font-size: 2em; color: #111827; }
-                  h2 { font-size: 1.5em; color: #111827; }
-                  h3 { font-size: 1.17em; color: #111827; }
+                  h1, h2, h3, h4, h5, h6 {
+                    font-weight: 600;
+                    line-height: 1.25;
+                    margin-top: 1.5em;
+                    margin-bottom: 0.5em;
+                  }
+                  p { margin: 1em 0; }
+                  a { color: #2563eb; }
                   img { max-width: 100%; height: auto; }
-                  table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-                  table td, table th { border: 1px solid #e5e7eb; padding: 0.75em; }
-                  blockquote { 
-                    border-left: 4px solid #3b82f6; 
-                    padding-left: 1em; 
-                    margin: 1em 0; 
-                    color: #4b5563;
+                  blockquote {
+                    border-left: 4px solid #e5e7eb;
+                    margin: 1em 0;
+                    padding-left: 1em;
+                    font-style: italic;
+                  }
+                  code {
+                    background: #f3f4f6;
+                    padding: 0.2em 0.4em;
+                    border-radius: 3px;
+                    font-size: 0.9em;
                   }
                 `,
-                branding: false, // Remove TinyMCE branding
-                statusbar: false, // Cleaner UI without statusbar
-                toolbar_mode: 'sliding', // Modern toolbar behavior
-                icons: 'thin', // Cleaner icons
-                placeholder: "Start writing your content here...",
+                setup: (editor) => {
+                  editor.on('init', () => {
+                    editor.getContainer().style.transition = "border-color 0.2s ease-in-out";
+                  });
+                },
+                image_title: true,
+                automatic_uploads: true,
+                file_picker_types: 'image',
+                paste_data_images: true,
+                browser_spellcheck: true,
+                contextmenu: false,
+                link_context_toolbar: true,
+                link_default_target: '_blank',
+                link_assume_external_targets: true,
+                table_default_styles: {
+                  width: '100%'
+                },
+                table_responsive_width: true,
+                table_default_attributes: {
+                  border: '1'
+                },
+                style_formats: [
+                  { title: 'Paragraph', format: 'p' },
+                  { title: 'Heading 1', format: 'h1' },
+                  { title: 'Heading 2', format: 'h2' },
+                  { title: 'Heading 3', format: 'h3' },
+                  { title: 'Quote', format: 'blockquote' },
+                  { title: 'Code', format: 'code' }
+                ]
               }}
               onEditorChange={onChange}
             />

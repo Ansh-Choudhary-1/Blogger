@@ -100,9 +100,9 @@
 
 
 import React, { useState } from "react";
-import AuthService from "../appwrite/auth.js";
+import AuthService from "../appwrite/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../Store/authSlice.js";
+import { login } from "../store/authSlice";
 import { Button, Input, Logo } from "./index.js";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";

@@ -1,161 +1,3 @@
-// import React , {useCallback ,useEffect} from 'react';
-
-// import { useForm } from "react-hook-form";
-// import { Button, Input, Select, RTE } from "..";
-// import appwriteService from "../../appwrite/config";
-// import { useNavigate } from "react-router-dom";
-// import { useSelector } from "react-redux";
-
-// export default function PostForm({ post }) {
-//   // these props are from react hook form post me agr title ha toh wahi title wrna empty
-//   const { register, handleSubmit, watch, setValue, control, getValues } =
-//     useForm({
-//       defaultValues: {
-//         title: post?.title || "",
-//         slug: post?.$id || "",
-//         content: post?.content || "",
-//         status: post?.status || "active",
-//       },
-//     });
-
-//   const navigate = useNavigate();
-//   const userData = useSelector((state) => state.auth.userData);
-//   // console.log("Current User:",userData);
-  
-
-//   const submit = async (data) => {
-//     //this is scenario 1 where post is present and updating an exciting post
-//     if (post) {
-//       // agr post ha ur usme image ha toh appwrite me upload krdo
-//       const file = data.featuredimage?.[0]
-//         ? await appwriteService.uploadFile(data.featuredimages[0])
-//         : null;
-//       if (file) {
-//         // agr file ha toh delete kar sakte ha
-//         appwriteService.deleteFile(post.featuredImage);
-//       }
-
-//       //update post with slug and spreading the data
-//       const dbPost = await appwriteService.updatePost(post.$id, {
-//         ...data,
-//         featuredImage: file ? file.$id : undefined,
-//       });
-
-//       if (dbPost) {
-//         navigate(`/post/${dbPost.$id}`);
-//       }
-//     }
-
-//     // this is scenario 2 creating a new post
-//     else {
-//       const file = await appwriteService.uploadFile(data.featuredimages[0]);
-
-//       if(file && userData) {
-
-//         const fileId = file.$id;//syntax 
-//         data.featuredimages = fileId;
-//         const dbPost = await appwriteService.createPost({
-//           ...data,
-//           userId: userData.$id
-//         });
-
-//         if (dbPost) {
-//           navigate(`/post/${dbPost.$id}`);
-//         }
-//       }
-//     }
-//   };
-//   //slug transform agr value ha and uska type string toh value jo return hogi ase operation hone ke baad
-//   // we used useCallback bcoz when the site refreshed it always recreted always check value and return value and re render
-//   const slugTransform = useCallback((value) => {
-//     if (value && typeof value === "string")
-//       return value
-//         .trim()
-//         .toLowerCase()
-//         .replace(/[^a-zA-Z\d\s]+/g, "-")
-//         .replace(/\s/g, "-");
-
-//     return "";
-//   }, []);
-
-//   // we used useEffect in this update the slug dynamically and sets up watch subscription
-//   //watch is the function in the react hook form to listens to the changes in the form
-// useEffect(() => {
-//     const subscription = watch((value, { name }) => {
-//       if (name === "title") {
-//         setValue("slug", slugTransform(value.title), { shouldValidate: true });
-//       }
-//     });
-
-//     return () => subscription.unsubscribe(); //cleanup function for useeffect hook unsubscribe the subscription of watch listener.
-//   }, [watch, slugTransform, setValue]);
-
-//   return (
-//     <form
-//       onSubmit={handleSubmit(submit)}
-//       className="flex flex-wrap  shadow-lg rounded-lg p-6 md:p-10 "
-//     >
-//       <div className=" w-full md:w-2/3 px-2">
-//         <Input
-//           label="Title :"
-//           placeholder="Title"
-//           className="mb-4 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500"
-//           {...register("title", { required: true })}
-//         />
-//         <Input
-//           label="Slug :"
-//           placeholder="Slug"
-//           className="mb-4 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500"
-//           {...register("slug", { required: true })}
-//           onInput={(e) => {
-//             setValue("slug", slugTransform(e.currentTarget.value), {
-//               shouldValidate: true,
-//             });
-//           }}
-//         />
-//         <RTE
-//           label="Content :"
-//           name="content"
-//           control={control}
-//           defaultValue={getValues("content")}
-//           className="flex mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//         />
-//       </div>
-//       <div className=" w-full md:w-1/3 px-2">
-//         <Input
-//           label="Featured Image :"
-//           type="file"
-//           className="mb-4 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500 "
-//           accept="image/png, image/jpg, image/jpeg, image/gif"
-//           {...register("featuredimages", { required: !post })}
-//         />
-//         {post && (
-//           <div className="w-full mb-4">
-//             <img
-//               src={appwriteService.getFilePreview(post.featuredImage)}
-//               alt={post.title}
-//               className="rounded-lg shadow-md w-full object-cover"
-//             />
-//           </div>
-//         )}
-//         <Select
-//           options={["active", "inactive"]}
-//           label="Status"
-//           className="mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//           {...register("status", { required: true })}
-//         />
-//         <Button
-//           type="submit"
-//           bgColor={post ? "bg-green-500" : undefined}
-//           className="w-full"
-//         >
-//           {post ? "Update" : "Submit"}
-//         </Button>
-//       </div>
-//     </form>
-//   );
-// }
-
 import React, { useCallback, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { Button, Input, Select, RTE } from "..";
@@ -164,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
+  const { register, handleSubmit, watch, setValue, control, getValues, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       title: post?.title || "",
       slug: post?.$id || "",
@@ -177,37 +19,42 @@ export default function PostForm({ post }) {
   const userData = useSelector((state) => state.auth.userData);
 
   const submit = async (data) => {
-    if (post) {
-      const file = data.featuredimages?.[0]
-        ? await appwriteService.uploadFile(data.featuredimages[0])
-        : null;
-      if (file) {
-        appwriteService.deleteFile(post.featuredImage);
-      }
+    try {
+      if (post) {
+        const file = data.featuredimages?.[0]
+          ? await appwriteService.uploadFile(data.featuredimages[0])
+          : null;
+        
+        if (file) {
+          await appwriteService.deleteFile(post.featuredImage);
+        }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
-
-      if (dbPost) {
-        navigate(`/post/${dbPost.$id}`);
-      }
-    } else {
-      const file = await appwriteService.uploadFile(data.featuredimages[0]);
-
-      if (file && userData) {
-        const fileId = file.$id;
-        data.featuredimages = fileId;
-        const dbPost = await appwriteService.createPost({
+        const dbPost = await appwriteService.updatePost(post.$id, {
           ...data,
-          userId: userData.$id
+          featuredImage: file ? file.$id : undefined,
         });
 
         if (dbPost) {
           navigate(`/post/${dbPost.$id}`);
         }
+      } else {
+        const file = await appwriteService.uploadFile(data.featuredimages[0]);
+
+        if (file && userData) {
+          const fileId = file.$id;
+          data.featuredimages = fileId;
+          const dbPost = await appwriteService.createPost({
+            ...data,
+            userId: userData.$id
+          });
+
+          if (dbPost) {
+            navigate(`/post/${dbPost.$id}`);
+          }
+        }
       }
+    } catch (error) {
+      console.error('Error submitting post:', error);
     }
   };
 
@@ -232,89 +79,104 @@ export default function PostForm({ post }) {
   }, [watch, slugTransform, setValue]);
 
   return (
-    <form
-      onSubmit={handleSubmit(submit)}
-      className="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-8"
-    >
-      <div className="md:flex gap-8">
-        {/* Left Column (2/3 width) */}
-        <div className="w-full md:w-2/3 space-y-6">
-          <Input
-            label="Title:"
-            placeholder="Enter post title"
-            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            {...register("title", { required: true })}
-          />
+    <form onSubmit={handleSubmit(submit)} className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card p-6">
+            <Input
+              label="Title"
+              placeholder="Enter post title"
+              className="text-xl font-display"
+              error={errors.title?.message}
+              {...register("title", { 
+                required: "Title is required",
+                minLength: {
+                  value: 3,
+                  message: "Title must be at least 3 characters"
+                }
+              })}
+            />
 
-          <Input
-            label="Slug:"
-            placeholder="Post slug will be auto-generated"
-            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            {...register("slug", { required: true })}
-            onInput={(e) => {
-              setValue("slug", slugTransform(e.currentTarget.value), {
-                shouldValidate: true,
-              });
-            }}
-          />
+            <Input
+              label="Slug"
+              placeholder="Post URL slug"
+              className="mt-4"
+              error={errors.slug?.message}
+              {...register("slug", { 
+                required: "Slug is required",
+                pattern: {
+                  value: /^[a-z0-9-]+$/,
+                  message: "Slug can only contain lowercase letters, numbers, and hyphens"
+                }
+              })}
+              onInput={(e) => {
+                setValue("slug", slugTransform(e.currentTarget.value), {
+                  shouldValidate: true,
+                });
+              }}
+            />
+          </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Content:</label>
+          <div className="card p-6">
             <RTE
+              label="Content"
               name="content"
               control={control}
               defaultValue={getValues("content")}
-              className="min-h-[300px] border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
         </div>
 
-        {/* Right Column (1/3 width) */}
-        <div className="w-full md:w-1/3 space-y-6 mt-6 md:mt-0">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Featured Image:
-            </label>
-            <input
-              type="file"
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-              accept="image/png, image/jpg, image/jpeg, image/gif"
-              {...register("featuredimages", { required: !post })}
-            />
-          </div>
-
-          {post && (
-            <div className="rounded-lg overflow-hidden border border-gray-200">
-              <img
-                src={appwriteService.getFilePreview(post.featuredImage)}
-                alt={post.title}
-                className="w-full h-auto object-cover"
+        <div className="space-y-6">
+          <div className="card p-6">
+            <h3 className="text-lg font-display font-semibold text-gray-900 mb-4">
+              Post Settings
+            </h3>
+            
+            <div className="space-y-4">
+              <Input
+                label="Featured Image"
+                type="file"
+                accept="image/png, image/jpg, image/jpeg, image/gif"
+                error={errors.featuredimages?.message}
+                {...register("featuredimages", { required: !post })}
               />
+
+              {post?.featuredImage && (
+                <div className="mt-2 rounded-lg overflow-hidden">
+                  <img
+                    src={appwriteService.getFilePreview(post.featuredImage)}
+                    alt={post.title}
+                    className="w-full h-auto"
+                  />
+                </div>
+              )}
+
+              <Select
+                options={["active", "inactive"]}
+                label="Status"
+                {...register("status", { required: true })}
+              />
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4\" xmlns="http://www.w3.org/2000/svg\" fill="none\" viewBox="0 0 24 24">
+                      <circle className="opacity-25\" cx="12\" cy="12\" r="10\" stroke="currentColor\" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {post ? "Updating..." : "Creating..."}
+                  </span>
+                ) : (
+                  post ? "Update Post" : "Create Post"
+                )}
+              </Button>
             </div>
-          )}
-
-          <Select
-            options={["active", "inactive"]}
-            label="Status:"
-            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            {...register("status", { required: true })}
-          />
-
-          <Button
-            type="submit"
-            className={`w-full py-3 px-4 justify-center rounded-md shadow-sm text-sm font-medium text-white ${
-              post ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              post ? 'focus:ring-green-500' : 'focus:ring-blue-500'
-            } transition-colors duration-200`}
-          >
-            {post ? "Update Post" : "Create Post"}
-          </Button>
+          </div>
         </div>
       </div>
     </form>

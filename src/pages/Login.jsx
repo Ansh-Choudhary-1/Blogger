@@ -14,7 +14,7 @@
 
 
 import React from 'react'
-import { Login as LoginComponent } from '../Components'
+import { Login as LoginComponent } from '../components'
 
 function Login() {
   return (
