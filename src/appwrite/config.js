@@ -14,23 +14,25 @@ export class AppwriteService {
     this.bucket = new Storage(this.client);
   }
 
-  async createPost({ title, slug, content, featuredimages, status, userId }) {
-    console.log(userId);
-    try {
-      //mongodb kar deneg if koi issue huya to 
-      return await this.databases.createDocument(
-        conf.appwritedatabaseid,
-        conf.appwritecollectionid,
-        slug, //document id hota hai but
-        //id.unique bhi hota hai
-        { title, content, featuredimages, status, userId }
-        
-      );
-    } catch (error) {
-      console.error("Error in createPost:", error);
-      throw error;
-    }
+  async createPost({title,slug,content,featuredImage,status,userId,}) {
+  try {
+    return await this.databases.createDocument(
+      conf.appwritedatabaseid,
+      conf.appwritecollectionid,
+      slug,
+      {
+        title,
+        content,
+        featuredImage,
+        status,
+        userId,
+      }
+    );
+  } catch (error) {
+    console.error("Error in createPost:", error);
+    throw error;
   }
+}
 
   async updatePost(slug, { title, content, featuredImage, status }) {
     try {
