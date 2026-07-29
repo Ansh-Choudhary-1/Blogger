@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, Select, RTE } from "..";
 import appwriteService from "../../appwrite/config";
@@ -6,7 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, watch, setValue, control, getValues, formState: { errors, isSubmitting } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    control,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({
     defaultValues: {
       title: post?.title || "",
       slug: post?.$id || "",
@@ -21,40 +29,61 @@ export default function PostForm({ post }) {
   const submit = async (data) => {
     try {
       if (post) {
-        const file = data.featuredimages?.[0]
-          ? await appwriteService.uploadFile(data.featuredimages[0])
-          : null;
-        
-        if (file) {
-          await appwriteService.deleteFile(post.featuredImage);
+        let file = null;
+
+        if (data.featuredimages && data.featuredimages[0]) {
+          file = await appwriteService.uploadFile(data.featuredimages[0]);
+
+          if (!file) {
+            throw new Error("Image upload failed");
+          }
+
+          if (post.featuredImage) {
+            await appwriteService.deleteFile(post.featuredImage);
+          }
         }
 
         const dbPost = await appwriteService.updatePost(post.$id, {
-          ...data,
-          featuredImage: file ? file.$id : undefined,
+          title: data.title,
+          content: data.content,
+          status: data.status,
+          featuredImage: file ? file.$id : post.featuredImage,
         });
 
         if (dbPost) {
           navigate(`/post/${dbPost.$id}`);
         }
       } else {
-        const file = await appwriteService.uploadFile(data.featuredimages[0]);
+        if (!data.featuredimages || !data.featuredimages[0]) {
+          alert("Please select an image.");
+          return;
+        }
 
-        if (file && userData) {
-          const fileId = file.$id;
-          data.featuredimages = fileId;
-          const dbPost = await appwriteService.createPost({
-            ...data,
-            userId: userData.$id
-          });
+        const file = await appwriteService.uploadFile(
+          data.featuredimages[0]
+        );
 
-          if (dbPost) {
-            navigate(`/post/${dbPost.$id}`);
-          }
+        if (!file) {
+          throw new Error("Image upload failed");
+        }
+
+        console.log("Uploaded File:", file);
+
+        const dbPost = await appwriteService.createPost({
+          title: data.title,
+          slug: data.slug,
+          content: data.content,
+          status: data.status,
+          featuredImage: file.$id,
+          userId: userData.$id,
+        });
+
+        if (dbPost) {
+          navigate(`/post/${dbPost.$id}`);
         }
       }
     } catch (error) {
-      console.error('Error submitting post:', error);
+      console.error("Error submitting post:", error);
     }
   };
 
@@ -64,14 +93,17 @@ export default function PostForm({ post }) {
         .trim()
         .toLowerCase()
         .replace(/[^a-zA-Z\d\s]+/g, "-")
-        .replace(/\s/g, "-");
+        .replace(/\s+/g, "-");
+
     return "";
   }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === "title") {
-        setValue("slug", slugTransform(value.title), { shouldValidate: true });
+        setValue("slug", slugTransform(value.title), {
+          shouldValidate: true,
+        });
       }
     });
 
@@ -88,12 +120,12 @@ export default function PostForm({ post }) {
               placeholder="Enter post title"
               className="text-xl font-display"
               error={errors.title?.message}
-              {...register("title", { 
+              {...register("title", {
                 required: "Title is required",
                 minLength: {
                   value: 3,
-                  message: "Title must be at least 3 characters"
-                }
+                  message: "Title must be at least 3 characters",
+                },
               })}
             />
 
@@ -102,18 +134,19 @@ export default function PostForm({ post }) {
               placeholder="Post URL slug"
               className="mt-4"
               error={errors.slug?.message}
-              {...register("slug", { 
+              {...register("slug", {
                 required: "Slug is required",
                 pattern: {
                   value: /^[a-z0-9-]+$/,
-                  message: "Slug can only contain lowercase letters, numbers, and hyphens"
-                }
+                  message:
+                    "Slug can only contain lowercase letters, numbers, and hyphens",
+                },
               })}
-              onInput={(e) => {
+              onInput={(e) =>
                 setValue("slug", slugTransform(e.currentTarget.value), {
                   shouldValidate: true,
-                });
-              }}
+                })
+              }
             />
           </div>
 
@@ -132,14 +165,16 @@ export default function PostForm({ post }) {
             <h3 className="text-lg font-display font-semibold text-gray-900 mb-4">
               Post Settings
             </h3>
-            
+
             <div className="space-y-4">
               <Input
                 label="Featured Image"
                 type="file"
-                accept="image/png, image/jpg, image/jpeg, image/gif"
+                accept="image/png,image/jpeg,image/jpg,image/gif"
                 error={errors.featuredimages?.message}
-                {...register("featuredimages", { required: !post })}
+                {...register("featuredimages", {
+                  required: !post,
+                })}
               />
 
               {post?.featuredImage && (
@@ -155,7 +190,9 @@ export default function PostForm({ post }) {
               <Select
                 options={["active", "inactive"]}
                 label="Status"
-                {...register("status", { required: true })}
+                {...register("status", {
+                  required: true,
+                })}
               />
 
               <Button
@@ -165,14 +202,31 @@ export default function PostForm({ post }) {
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4\" xmlns="http://www.w3.org/2000/svg\" fill="none\" viewBox="0 0 24 24">
-                      <circle className="opacity-25\" cx="12\" cy="12\" r="10\" stroke="currentColor\" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
+
                     {post ? "Updating..." : "Creating..."}
                   </span>
                 ) : (
-                  post ? "Update Post" : "Create Post"
+                  (post ? "Update Post" : "Create Post")
                 )}
               </Button>
             </div>
