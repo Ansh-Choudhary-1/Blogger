@@ -136,7 +136,7 @@ export default function Post() {
     if (post && post.$id) {
       appwriteService.deletePost(slug).then((status) => {
         if (status.success) {
-          appwriteService.deleteFile(post.featuredimages);
+          appwriteService.deleteFile(post.featuredImages);
           navigate("/");
         }
       }).catch((error) => {
@@ -147,9 +147,9 @@ export default function Post() {
 
   useEffect(() => {
     const fetchImage = async () => {
-      if (post && post.featuredimages) {
+      if (post && post.featuredImages) {
         try {
-          const url = await appwriteService.getFilePreview(post.featuredimages);
+          const url = await appwriteService.getFilePreview(post.featuredImages);
           setImage(url);
         } catch (error) {
           console.error("Error fetching image:", error);
