@@ -34,7 +34,7 @@ import React, { useEffect, useState } from "react";
 import appwriteService from "../appwrite/config";
 import { Link } from "react-router-dom";
 
-function PostCard({ $id, title, featuredimages }) {
+function PostCard({ $id, title, featuredImages }) {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,8 +43,8 @@ function PostCard({ $id, title, featuredimages }) {
     const fetchImage = async () => {
       try {
         setIsLoading(true);
-        if (featuredimages) {
-          const data = await appwriteService.getFilePreview(featuredimages);
+        if (featuredImages) {
+          const data = await appwriteService.getFilePreview(featuredImages);
           setImage(data);
         }
       } catch (error) {
