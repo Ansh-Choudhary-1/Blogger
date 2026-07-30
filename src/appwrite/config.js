@@ -125,17 +125,21 @@ export class AppwriteService {
   }
 
   async getFilePreview(fileId) {
-    try {
-      if (!fileId) {
-        console.error("No file ID provided to getFilePreview");
-        return null;
-      }
-      return this.bucket.getFileView(conf.appwritebucketid, fileId);
-    } catch (error) {
-      console.error("Error in getFilePreview:", error);
+  try {
+    if (!fileId) {
+      console.error("No file ID provided to getFilePreview");
       return null;
     }
+
+    return this.bucket.getFileView(
+      conf.appwritebucketid,
+      fileId
+    );
+  } catch (error) {
+    console.error("Error in getFilePreview:", error);
+    return null;
   }
+}
 }
 
 const appwriteService = new AppwriteService();
