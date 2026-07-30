@@ -131,10 +131,12 @@ export class AppwriteService {
       return null;
     }
 
-    return this.bucket.getFileView(
+    const file =  this.bucket.getFileView(
       conf.appwritebucketid,
       fileId
     );
+    console.log(file);
+    return file;
   } catch (error) {
     console.error("Error in getFilePreview:", error);
     return null;

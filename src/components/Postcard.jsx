@@ -56,8 +56,13 @@ function PostCard({ $id, title, featuredImage }) {
     };
 
     fetchImage();
+<<<<<<< HEAD
   }, [featuredImage]);
 
+=======
+  }, [featuredImages]);
+  console.log("featuredImage:", featuredImage);
+>>>>>>> 66248c2c37ec3d186d051e1221894e22cbfe148b
   return (
     <Link to={`/post/${$id}`} className="block h-full">
       <div className="h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
