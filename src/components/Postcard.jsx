@@ -56,7 +56,7 @@ function PostCard({ $id, title, featuredImages }) {
     };
 
     fetchImage();
-  }, [featuredimages]);
+  }, [featuredImages]);
 
   return (
     <Link to={`/post/${$id}`} className="block h-full">
