@@ -31,8 +31,8 @@ export default function PostForm({ post }) {
       if (post) {
         let file = null;
 
-        if (data.featuredImages && data.featuredImages[0]) {
-          file = await appwriteService.uploadFile(data.featuredImages[0]);
+        if (data.featuredImage && data.featuredImage[0]) {
+          file = await appwriteService.uploadFile(data.featuredImage[0]);
 
           if (!file) {
             throw new Error("Image upload failed");
@@ -54,13 +54,13 @@ export default function PostForm({ post }) {
           navigate(`/post/${dbPost.$id}`);
         }
       } else {
-        if (!data.featuredImages || !data.featuredImages[0]) {
+        if (!data.featuredImage || !data.featuredImage[0]) {
           alert("Please select an image.");
           return;
         }
 
         const file = await appwriteService.uploadFile(
-          data.featuredImages[0]
+          data.featuredImage[0]
         );
 
         if (!file) {
@@ -171,8 +171,8 @@ export default function PostForm({ post }) {
                 label="Featured Image"
                 type="file"
                 accept="image/png,image/jpeg,image/jpg,image/gif"
-                error={errors.featuredImages?.message}
-                {...register("featuredimages", {
+                error={errors.featuredImage?.message}
+                {...register("featuredImage", {
                   required: !post,
                 })}
               />
