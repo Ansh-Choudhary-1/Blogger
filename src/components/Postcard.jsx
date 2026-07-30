@@ -34,7 +34,7 @@ import React, { useEffect, useState } from "react";
 import appwriteService from "../appwrite/config";
 import { Link } from "react-router-dom";
 
-function PostCard({ $id, title, featuredImages }) {
+function PostCard({ $id, title, featuredImage }) {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,8 +43,8 @@ function PostCard({ $id, title, featuredImages }) {
     const fetchImage = async () => {
       try {
         setIsLoading(true);
-        if (featuredImages) {
-          const data = await appwriteService.getFilePreview(featuredImages);
+        if (featuredImage) {
+          const data = await appwriteService.getFilePreview(featuredImage);
           setImage(data);
         }
       } catch (error) {
@@ -57,7 +57,7 @@ function PostCard({ $id, title, featuredImages }) {
 
     fetchImage();
   }, [featuredImages]);
-
+  console.log("featuredImage:", featuredImage);
   return (
     <Link to={`/post/${$id}`} className="block h-full">
       <div className="h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
